@@ -9,10 +9,10 @@ MongoClient.connect(connectionUrl, { useNewUrlParser: true, useUnifiedTopology: 
     //database to connect
     const db = result.db(databaseName);
     //collection to use
-    db.collection('users').insertOne({
-        name: 'long bui',
-        age: 21
+    db.collection('users').insertMany([{
+        task: 'clean your house',
+        isDone: true
+    }], (err, res) => {
+        console.log(res.ops)
     })
-
-
 })
