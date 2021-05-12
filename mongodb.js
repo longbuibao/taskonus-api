@@ -7,12 +7,11 @@ MongoClient.connect(connectionUrl, { useNewUrlParser: true, useUnifiedTopology: 
     (err, result) => {
         if (err) return console.log('There is an error');
         const database = result.db(databaseName);
-        database.collection('users').find({ age: { $gt: 2 } }).toArray((_, res) => {
-            console.log(res)
-        })
-        database.collection('users').findOne(new mongodb.ObjectID('609a4689ada6e4d00a280aa6'),
-            (_, res) => {
-                console.log(res)
-            }
-        )
+        database.collection('users').updateMany({ age: { $exists: true } }, { $set: { age: 1234 } })
+            .then(res => {
+                console.log(res.modifiedCount)
+            })
+            .catch(err => {
+                console.log(err)
+            })
     })
