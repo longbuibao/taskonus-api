@@ -7,9 +7,9 @@ MongoClient.connect(connectionUrl, { useNewUrlParser: true, useUnifiedTopology: 
     (err, result) => {
         if (err) return console.log('There is an error');
         const database = result.db(databaseName);
-        database.collection('users').updateMany({ age: { $exists: true } }, { $set: { age: 1234 } })
+        database.collection('users').deleteOne({ _id: new mongodb.ObjectID('609a3dce38b1f4bad06b6bf2') })
             .then(res => {
-                console.log(res.modifiedCount)
+                console.log(res.deletedCount)
             })
             .catch(err => {
                 console.log(err)
