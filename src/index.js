@@ -43,6 +43,31 @@ app.get('/users/:id', async(req, res) => {
     }
 })
 
+//update user
+app.patch('/users/:id', async(req, res) => {
+    const _id = req.params.id
+    const newValue = req.body
+    const keys = Object.keys(newValue)
+    const check = keys.every((key) => {
+        return ["name", "email", "password"].includes(key)
+    })
+    if (check) {
+        try {
+            const user = await User.findByIdAndUpdate(_id, newValue, { new: true, runValidators: true })
+            if (!user) {
+                return res.status(404).send('not found user')
+            }
+            const updatedUser = await User.findById(_id)
+            res.status(200).send(updatedUser)
+
+        } catch (e) {
+            res.status(500).send('something wrong')
+        }
+    } else {
+        res.status(400).send("accept values: ['name', 'email', 'password']")
+    }
+})
+
 //create a task
 app.post('/tasks', async(req, res) => {
         try {
@@ -76,7 +101,6 @@ app.get('/tasks/:id', async(req, res) => {
         res.status(500).send('something wrong')
     }
 })
-
 
 app.listen(port, () => {
     console.log('server is up at ' + port)

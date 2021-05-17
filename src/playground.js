@@ -22,7 +22,11 @@ async function removeTask(id) {
 async function findAllIncompleteTasks() {
     const numberOfIncompleteTasks = await Task.countDocuments({ completed: false })
     console.log(`number Of Incomplete Tasks: ${numberOfIncompleteTasks}`)
+    return numberOfIncompleteTasks
 }
 
-removeTask('60a0cac8d178b33f8ccdd0f9')
-findAllIncompleteTasks()
+removeTask('60a0cac8d178b33f8ccdd0f9');
+(async function() {
+    const num = await findAllIncompleteTasks()
+    console.log(num, 'hellooooooooooooo')
+})()
