@@ -1,10 +1,14 @@
 const express = require('express')
 const router = new express.Router()
 const User = require('../models/user')
+const bcrypt = require('bcrypt')
     //create a user
 router.post('/users', async(req, res) => {
     try {
         const user = new User(req.body)
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(user.password, saltRounds)
+        user.password = hashedPassword
         await user.save()
         res.status(201).send('saved user')
     } catch (e) {
@@ -44,6 +48,11 @@ router.patch('/users/:id', async(req, res) => {
         return ["name", "email", "password"].includes(key)
     })
     if (check) {
+        if (keys.includes('password')) {
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(newValue.password, saltRounds)
+            newValue.password = hashedPassword
+        }
         try {
             const user = await User.findByIdAndUpdate(_id, newValue, { new: true, runValidators: true })
             if (!user) {
