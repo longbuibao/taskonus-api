@@ -1,18 +1,14 @@
 const express = require('express')
 const router = new express.Router()
 const User = require('../models/user')
-const bcrypt = require('bcrypt')
     //create a user
 router.post('/users', async(req, res) => {
     try {
         const user = new User(req.body)
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(user.password, saltRounds)
-        user.password = hashedPassword
         await user.save()
-        res.status(201).send('saved user')
+        res.status(201).send('created user')
     } catch (e) {
-        res.status(400).send("check again sir")
+        res.status(400).send(e)
     }
 });
 //fetch all users
@@ -21,7 +17,7 @@ router.get('/users', async(req, res) => {
         const users = await User.find({})
         res.status(200).send(users)
     } catch (e) {
-        res.status(400).send("something went wrong")
+        res.status(400).send(e)
     }
 });
 //fetch user by its id
@@ -35,7 +31,7 @@ router.get('/users/:id', async(req, res) => {
         res.status(200).send(user)
 
     } catch (e) {
-        res.status(500).send('something wrong')
+        res.status(500).send(e)
     }
 });
 
@@ -48,21 +44,18 @@ router.patch('/users/:id', async(req, res) => {
         return ["name", "email", "password"].includes(key)
     })
     if (check) {
-        if (keys.includes('password')) {
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(newValue.password, saltRounds)
-            newValue.password = hashedPassword
-        }
         try {
-            const user = await User.findByIdAndUpdate(_id, newValue, { new: true, runValidators: true })
+            const user = await User.findById(_id)
             if (!user) {
                 return res.status(404).send('not found user')
             }
-            const updatedUser = await User.findById(_id)
+            keys.forEach(key => {
+                user[key] = newValue[key]
+            })
+            const updatedUser = await user.save()
             res.status(200).send(updatedUser)
-
         } catch (e) {
-            res.status(500).send('something wrong')
+            res.status(500).send(e)
         }
     } else {
         res.status(400).send("accepted keys: ['name', 'email', 'password']")
@@ -79,7 +72,7 @@ router.delete('/users/:id', async(req, res) => {
         res.send(`deleted user ${user}`)
 
     } catch (e) {
-        res.status(500).send('something wrong')
+        res.status(500).send(e)
     }
 
 });
