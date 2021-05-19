@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true,
         default: null,
+        unique: true,
         validate(val) {
             if (!validator.isEmail(val)) {
                 throw new Error('Check your email again')
@@ -37,6 +38,9 @@ const userSchema = new mongoose.Schema({
     }
 })
 
+
+
+//hash plain text password before saving
 userSchema.pre('save', async function(next) {
     const user = this
     if (user.isModified('password')) {
@@ -45,7 +49,19 @@ userSchema.pre('save', async function(next) {
     next()
 })
 
-const User = mongoose.model('User', userSchema)
+userSchema.statics.findByCredentials = async(userObject) => {
+    const { email, password } = userObject
+    const user = await User.findOne({ email })
+    if (!user) {
+        throw new Error('unable to login')
+    }
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch) {
+        throw new Error('email or password is incorrect')
+    }
+    return user
+}
 
+const User = mongoose.model('User', userSchema)
 
 module.exports = User

@@ -1,7 +1,7 @@
 const express = require('express')
 const router = new express.Router()
-const User = require('../models/user')
-    //create a user
+const User = require('../models/user');
+//create a user
 router.post('/users', async(req, res) => {
     try {
         const user = new User(req.body)
@@ -9,6 +9,15 @@ router.post('/users', async(req, res) => {
         res.status(201).send('created user')
     } catch (e) {
         res.status(400).send(e)
+    }
+});
+
+router.post('/users/login', async(req, res) => {
+    try {
+        const user = await User.findByCredentials(req.body)
+        res.send(user)
+    } catch (e) {
+        res.status(400).send(e.message)
     }
 });
 //fetch all users
