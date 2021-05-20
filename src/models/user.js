@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -18,10 +20,14 @@ const userSchema = new mongoose.Schema({
         trim: true,
         default: null,
         unique: true,
-        validate(val) {
+        async validate(val) {
             if (!validator.isEmail(val)) {
                 throw new Error('Check your email again')
             }
+            // const user = await User.findOne({ email: val });
+            // if (user) {
+            //     throw new Error('The specified email address is already in use.')
+            // }
         }
     },
     password: {
@@ -35,10 +41,23 @@ const userSchema = new mongoose.Schema({
                 throw new Error('password must be 6 characters or more')
             }
         }
-    }
+    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 })
 
+userSchema.methods.generateAuthToken = async function() {
+    const token = jwt.sign({ _id: this._id.toString() }, 'key')
 
+    this.tokens = this.tokens.concat({ token })
+    await this.save()
+
+    return token
+}
 
 //hash plain text password before saving
 userSchema.pre('save', async function(next) {

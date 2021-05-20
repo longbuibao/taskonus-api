@@ -30,7 +30,6 @@
 //     const num = await findAllIncompleteTasks()
 //     console.log(num, 'hellooooooooooooo')
 // })()
-const bcrypt = require('bcrypt')
 
 // bcrypt.genSalt(1, function(err, salt) {
 //     console.log('salt: ', salt)
@@ -39,4 +38,14 @@ const bcrypt = require('bcrypt')
 //     });
 // })
 
-bcrypt.hash('buibaolong', 1, (e, re) => { console.log(re) })
+const jwt = require('jsonwebtoken')
+
+function createJwt(obj, secretKey) {
+    const jwtUser = jwt.sign(obj, secretKey)
+    return jwtUser
+}
+
+const user = createJwt({ name: 'long' }, 'sh')
+const res = jwt.decode(user, null)
+console.log(user)
+console.log(res)
