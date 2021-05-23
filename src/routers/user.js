@@ -1,5 +1,6 @@
 const express = require('express')
 const router = new express.Router()
+const auth = require('../middleware/auth')
 const User = require('../models/user');
 //create a user
 router.post('/users', async(req, res) => {
@@ -17,19 +18,36 @@ router.post('/users/login', async(req, res) => {
     try {
         const user = await User.findByCredentials(req.body)
         const token = await user.generateAuthToken()
-        res.status(201).send({ user, token })
+        res.status(200).send({ user, token })
     } catch (e) {
         res.status(400).send(e.message)
     }
 });
-//fetch all users
-router.get('/users', async(req, res) => {
+//logout user
+router.post('/users/logout', auth, async(req, res) => {
     try {
-        const users = await User.find({})
-        res.status(200).send(users)
+        req.user.tokens = req.user.tokens.filter(token => {
+            return token.token !== req.token
+        })
+        await req.user.save()
+        res.send(req.user)
     } catch (e) {
-        res.status(400).send(e)
+        res.status(500).send(e.message)
     }
+});
+//logout all sessions
+router.post('/users/logoutall', auth, async(req, res) => {
+    try {
+        req.user.tokens = []
+        await req.user.save()
+        res.send(req.user)
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+});
+//fetch all users
+router.get('/users/me', auth, async(req, res) => {
+    res.status(200).send(req.user)
 });
 //fetch user by its id
 router.get('/users/:id', async(req, res) => {
