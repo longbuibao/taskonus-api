@@ -1,42 +1,35 @@
+const { ObjectID } = require('bson');
 const express = require('express')
 const router = new express.Router()
-const Task = require('../models/task')
-    //create a task
-router.post('/tasks', async(req, res) => {
+const auth = require('../middleware/auth')
+const Task = require('../models/task');
+
+//create a task
+router.post('/tasks', auth, async(req, res) => {
+        const task = new Task({
+            ...req.body,
+            owner: req.user._id
+        })
         try {
-            const task = new Task(req.body)
             await task.save()
-            res.status(201).send('saved task')
+            res.status(201).send(task)
         } catch (e) {
             res.status(400).send(e)
         }
     })
     //fetch all tasks
-router.get('/tasks', async(req, res) => {
+router.get('/tasks', auth, async(req, res) => {
+    const _id = req.user._id
     try {
-        const tasks = await Task.find({})
+        const tasks = await Task.find({ owner: new ObjectID(_id) })
         res.status(200).send(tasks)
     } catch (e) {
         res.status(400).send(e)
     }
 });
-//get a task by its id
-router.get('/tasks/:id', async(req, res) => {
-    const _id = req.params.id
-    try {
-        const task = await Task.findById(_id)
-        if (!task) {
-            return res.status(404).send('not found task')
-        }
-        res.status(200).send(task)
-
-    } catch (e) {
-        res.status(500).send(e)
-    }
-});
 //update task
-router.patch('/tasks/:id', async(req, res) => {
-    const _id = req.params.id
+router.patch('/tasks/update/:id', auth, async(req, res) => {
+    const taskId = req.params.id
     const newValue = req.body
     const keys = Object.keys(newValue)
     const check = keys.every((key) => {
@@ -44,7 +37,7 @@ router.patch('/tasks/:id', async(req, res) => {
     })
     if (check) {
         try {
-            const task = await Task.findById(_id)
+            const tasks = await Task.find()
             if (!task) {
                 return res.status(404).send('not found task')
             }
@@ -63,7 +56,7 @@ router.patch('/tasks/:id', async(req, res) => {
 });
 
 //delete task
-router.delete('/tasks/:id', async(req, res) => {
+router.delete('/tasks/delete/:id', auth, async(req, res) => {
     const id = req.params.id
     try {
         const task = await Task.findByIdAndDelete(id)
