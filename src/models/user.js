@@ -79,7 +79,12 @@ userSchema.pre('save', async function(next) {
         user.password = await bcrypt.hash(user.password, 10)
     }
     next()
-})
+});
+//remove all tasks before remove user
+userSchema.pre('remove', async function(next) {
+    console.log('removing all task')
+    next()
+});
 
 userSchema.statics.findByCredentials = async(userObject) => {
     const { email, password } = userObject
