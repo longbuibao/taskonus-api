@@ -49,7 +49,6 @@ router.post('/users/logoutall', auth, async(req, res) => {
 router.get('/users/me', auth, async(req, res) => {
     res.status(200).send(req.user)
 });
-
 //update user
 router.patch('/users/me', auth, async(req, res) => {
     const newValue = req.body
