@@ -31,7 +31,8 @@ router.get('/tasks/:id', auth, async(req, res) => {
     }
 });
 
-//fetch all tasks
+//fetch {{url}}/tasks?completed=true
+//fetch {{url}}/limit=10?skip=0  --> fetch 10 and skip 0 page
 router.get('/tasks', auth, async(req, res) => {
     const match = {}
 
@@ -42,7 +43,11 @@ router.get('/tasks', auth, async(req, res) => {
     try {
         await req.user.populate({
             path: 'tasks',
-            match
+            match,
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip)
+            }
         }).execPopulate()
         res.status(200).send(req.user.tasks)
     } catch (e) {
