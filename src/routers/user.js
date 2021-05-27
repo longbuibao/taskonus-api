@@ -1,5 +1,6 @@
 const express = require('express')
 const multer = require('multer')
+const sharp = require('sharp')
 
 const router = new express.Router()
 
@@ -96,13 +97,19 @@ const upload = multer({
             return cb(new Error('File must be an image'))
         cb(undefined, true)
     }
-})
-
+});
+//upload user's avatar
 router.post('/users/me/avatar', auth, upload.single('avatar'), async(req, res) => {
+
+    const buffer = await sharp(req.file.buffer)
+        .resize({ width: 250 })
+        .toBuffer()
+    req.file.buffer = buffer
+
     try {
         req.user.avatarObj = {
             data: req.file.buffer,
-            contentType: 'image/' + req.file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)[1]
+            contentType: 'image/' + req.file.originalname.match(/\.(jpg|jpeg|png|gif)$/)[1]
         };
         await req.user.save();
         res.send({ message: "User avatar uploaded" });
@@ -126,14 +133,16 @@ router.delete('/users/me/avatar', auth, async(req, res) => {
 //get user avatar
 router.get('/users/:id/avatar', async(req, res) => {
     try {
+
         const user = await User.findById(req.params.id)
 
-        if (user && user.avatarObj.data) {
+        if (user && !user.avatarObj.$isEmpty()) {
             res.set('Content-Type', user.avatarObj.contentType)
             res.send(user.avatarObj.data)
         } else {
             throw new Error('Not found user or image')
         }
+
     } catch (err) {
         res.status(404).send({ error: err.message })
     }

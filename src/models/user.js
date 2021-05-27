@@ -3,7 +3,7 @@ const validator = require('validator')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Task = require('../models/task')
-const dotenv = require('dotenv').config()
+
 
 
 const userSchema = new mongoose.Schema({
@@ -26,10 +26,6 @@ const userSchema = new mongoose.Schema({
             if (!validator.isEmail(val)) {
                 throw new Error('Check your email again')
             }
-            // const user = await User.findOne({ email: val });
-            // if (user) {
-            //     throw new Error('The specified email address is already in use.')
-            // }
         }
     },
     password: {
