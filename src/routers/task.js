@@ -33,20 +33,28 @@ router.get('/tasks/:id', auth, async(req, res) => {
 
 //fetch {{url}}/tasks?completed=true
 //fetch {{url}}/limit=10?skip=0  --> fetch 10 and skip 0 page
+//fetch {{url}}/sortBy=createdAt:asc (desc)
 router.get('/tasks', auth, async(req, res) => {
     const match = {}
+    const sort = {}
 
     if (req.query.completed) {
         match.completed = req.query.completed === 'true'
     }
 
+    if (req.query.sortBy) {
+        const parts = req.query.sortBy.split(':')
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+    }
     try {
         await req.user.populate({
             path: 'tasks',
             match,
             options: {
                 limit: parseInt(req.query.limit),
-                skip: parseInt(req.query.skip)
+                skip: parseInt(req.query.skip),
+                //asc 1, desc -1
+                sort
             }
         }).execPopulate()
         res.status(200).send(req.user.tasks)
