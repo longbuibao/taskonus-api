@@ -1,5 +1,8 @@
 const express = require('express')
+const multer = require('multer')
+
 const router = new express.Router()
+
 const auth = require('../middleware/auth')
 const User = require('../models/user');
 //create a user
@@ -80,5 +83,13 @@ router.delete('/users/me', auth, async(req, res) => {
     }
 
 });
+//upload user profile picture
+const upload = multer({
+    dest: 'avatars'
+})
+
+router.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
+    res.send({ status: 'OK' })
+})
 
 module.exports = router
