@@ -1,6 +1,5 @@
 const express = require('express')
 const multer = require('multer')
-const mime = require('mime-types')
 
 const router = new express.Router()
 
@@ -106,7 +105,7 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async(req, res) =
             contentType: 'image/' + req.file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)[1]
         };
         await req.user.save();
-        res.send();
+        res.send({ message: "User avatar uploaded" });
     } catch (err) {
         res.status(500).send(err);
     }
@@ -114,12 +113,12 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async(req, res) =
     res.status(400).send({ "error": err.message });
 })
 
-//delete user profile
+//delete user profile avatar
 router.delete('/users/me/avatar', auth, async(req, res) => {
     try {
-        req.user.avatar = undefined
+        req.user.avatarObj = undefined
         await req.user.save()
-        res.send({ status: 'Deleted user Profile' })
+        res.send({ message: "Deleted user's avatar" })
     } catch (error) {
         res.status(500).send(error.message)
     }
@@ -127,15 +126,16 @@ router.delete('/users/me/avatar', auth, async(req, res) => {
 //get user avatar
 router.get('/users/:id/avatar', async(req, res) => {
     try {
-        const user = await User.findById(req.params.id);
-        if (user && user.avatarObj) {
-            res.set('Content-Type', user.avatarObj.contentType);
-            res.send(user.avatarObj.data);
+        const user = await User.findById(req.params.id)
+
+        if (user && user.avatarObj.data) {
+            res.set('Content-Type', user.avatarObj.contentType)
+            res.send(user.avatarObj.data)
         } else {
-            throw new Error();
+            throw new Error('Not found user or image')
         }
     } catch (err) {
-        res.status(404).send();
+        res.status(404).send({ error: err.message })
     }
 });
 
