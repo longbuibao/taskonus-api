@@ -1,5 +1,6 @@
 const express = require('express')
 const multer = require('multer')
+const mime = require('mime-types')
 
 const router = new express.Router()
 
@@ -99,16 +100,18 @@ const upload = multer({
 })
 
 router.post('/users/me/avatar', auth, upload.single('avatar'), async(req, res) => {
-    req.user.avatar = req.file.buffer
     try {
-        await req.user.save()
-        res.send({ status: 'Uploaded user image' })
-    } catch (error) {
-        res.status(400).send({ message: error.message })
+        req.user.avatarObj = {
+            data: req.file.buffer,
+            contentType: 'image/' + req.file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)[1]
+        };
+        await req.user.save();
+        res.send();
+    } catch (err) {
+        res.status(500).send(err);
     }
-
 }, (err, req, res, next) => {
-    res.status(400).send({ message: err.message })
+    res.status(400).send({ "error": err.message });
 })
 
 //delete user profile
@@ -120,6 +123,20 @@ router.delete('/users/me/avatar', auth, async(req, res) => {
     } catch (error) {
         res.status(500).send(error.message)
     }
-})
+});
+//get user avatar
+router.get('/users/:id/avatar', async(req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (user && user.avatarObj) {
+            res.set('Content-Type', user.avatarObj.contentType);
+            res.send(user.avatarObj.data);
+        } else {
+            throw new Error();
+        }
+    } catch (err) {
+        res.status(404).send();
+    }
+});
 
 module.exports = router

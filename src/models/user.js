@@ -50,9 +50,10 @@ const userSchema = new mongoose.Schema({
             required: true
         }
     }],
-    avatar: {
-        type: Buffer
-    }
+    avatarObj: {
+        data: Buffer,
+        contentType: String
+    },
 }, {
     timestamps: true,
 })
