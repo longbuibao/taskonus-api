@@ -1,6 +1,8 @@
 const express = require('express')
 require('dotenv').config()
 
+
+
 const userRoute = require('../src/routers/user')
 const taskRoute = require('../src/routers/task')
 
@@ -14,6 +16,7 @@ app.use(express.json())
 
 app.use(userRoute)
 app.use(taskRoute)
+
 
 app.listen(port, () => {
     console.log('server is up at ' + port)

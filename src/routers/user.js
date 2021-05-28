@@ -1,7 +1,8 @@
 const express = require('express')
 const multer = require('multer')
 const sharp = require('sharp')
-
+const mailer = require('../utils/mailer')
+const os = require('os')
 const router = new express.Router()
 
 const auth = require('../middleware/auth')
@@ -11,6 +12,14 @@ router.post('/users', async(req, res) => {
     try {
         const user = new User(req.body)
         await user.save()
+
+        mailer({
+            from: process.env.NODEMAILER_USERNAME,
+            to: user.email,
+            subject: 'Your account is successfully created',
+            text: 'Star your plan with your new task manager application'
+        })
+
         const token = await user.generateAuthToken()
         res.status(201).send(token)
     } catch (e) {
@@ -21,6 +30,21 @@ router.post('/users', async(req, res) => {
 router.post('/users/login', async(req, res) => {
     try {
         const user = await User.findByCredentials(req.body)
+
+        const currentdate = new Date();
+        const datetime = currentdate.getDate() + "/" +
+            (currentdate.getMonth() + 1) + "/" +
+            currentdate.getFullYear() + " @ " +
+            currentdate.getHours() + ":" +
+            currentdate.getMinutes()
+
+        mailer({
+            from: process.env.NODEMAILER_USERNAME,
+            to: user.email,
+            subject: 'New login',
+            text: `Your account was login at ${datetime} using ${os.platform()}`
+        })
+
         const token = await user.generateAuthToken()
         res.status(200).send({ user, token })
     } catch (e) {
