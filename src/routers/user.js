@@ -18,6 +18,8 @@ router.post('/users', async(req, res) => {
             to: user.email,
             subject: 'Your account is successfully created',
             text: 'Star your plan with your new task manager application'
+        }).catch(e => {
+            console.log('something wrong with mailer')
         })
 
         const token = await user.generateAuthToken()
@@ -43,6 +45,8 @@ router.post('/users/login', async(req, res) => {
             to: user.email,
             subject: 'New login',
             text: `Your account was login at ${datetime} using ${os.platform()}`
+        }).catch(e => {
+            console.log('something wrong with mailer')
         })
 
         const token = await user.generateAuthToken()
@@ -100,13 +104,24 @@ router.patch('/users/me', auth, async(req, res) => {
 });
 //delete user
 router.delete('/users/me', auth, async(req, res) => {
+
     try {
         await req.user.remove()
+
+        mailer({
+            from: process.env.NODEMAILER_USERNAME,
+            to: req.user.email,
+            subject: 'Your account is successfully deleted',
+            text: 'Thank you for using our application, hope you back soon!'
+        }).catch(e => {
+            console.log('something wrong with mailer')
+        })
+
         res.send(`deleted user ${req.user.email}`)
+
     } catch (e) {
         res.status(500).send(e)
     }
-
 });
 //upload user profile picture
 const upload = multer({
@@ -128,6 +143,7 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async(req, res) =
     const buffer = await sharp(req.file.buffer)
         .resize({ width: 250 })
         .toBuffer()
+
     req.file.buffer = buffer
 
     try {
