@@ -15,7 +15,7 @@ npm install
 ```
 ##### For Windows
 
-Install Node.js and npm [[introduction]](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+Install Node.js and npm [[instruction]](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
 
 
