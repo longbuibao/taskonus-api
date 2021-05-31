@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
-
-const uri = `${process.env.DB_HOST}://${process.env.DB_USER}:${process.env.DB_PASS}@task-manager-api.zxm58.mongodb.net/task-manager-api?retryWrites=true&w=majority`
+const uri = `mongodb://127.0.0.1:27017/task-manager-api-test`
 
 mongoose.connect(uri, {
         useNewUrlParser: true,
@@ -8,5 +7,5 @@ mongoose.connect(uri, {
         useCreateIndex: true,
         useFindAndModify: false
     })
-    .then(res => console.log('connected to the database'))
+    .then(res => console.log('Database: OK 👍'))
     .catch(e => console.log(e))

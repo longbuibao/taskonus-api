@@ -40,14 +40,14 @@ router.post('/users/login', async(req, res) => {
             currentdate.getHours() + ":" +
             currentdate.getMinutes()
 
-        mailer({
-            from: process.env.NODEMAILER_USERNAME,
-            to: user.email,
-            subject: 'New login',
-            text: `Your account was login at ${datetime} using ${os.platform()}`
-        }).catch(e => {
-            console.log('something wrong with mailer')
-        })
+        // mailer({
+        //     from: process.env.NODEMAILER_USERNAME,
+        //     to: user.email,
+        //     subject: 'New login',
+        //     text: `Your account was login at ${datetime} using ${os.platform()}`
+        // }).catch(e => {
+        //     console.log('something wrong with mailer')
+        // })
 
         const token = await user.generateAuthToken()
         res.status(200).send({ user, token })
