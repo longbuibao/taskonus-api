@@ -34,6 +34,7 @@ router.get('/tasks/:id', auth, async(req, res) => {
 //fetch {{url}}/tasks?completed=true
 //fetch {{url}}/limit=10?skip=0  --> fetch 10 and skip 0 page
 //fetch {{url}}/sortBy=createdAt:asc (desc)
+//fetch {{url}}/tasks?collectionName
 router.get('/tasks', auth, async(req, res) => {
     const match = {}
     const sort = {}
@@ -45,6 +46,10 @@ router.get('/tasks', auth, async(req, res) => {
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
         sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+    }
+    if (req.query.collectionName) {
+        match.collectionName = req.query.collectionName
+        console.log(match)
     }
     try {
         await req.user.populate({
@@ -69,7 +74,7 @@ router.patch('/tasks/:id', auth, async(req, res) => {
     const newValue = req.body
     const keys = Object.keys(newValue)
     const check = keys.every((key) => {
-        return ["completed", "description"].includes(key)
+        return ["completed", "description", "collectionName"].includes(key)
     })
     if (check) {
         try {
@@ -87,7 +92,7 @@ router.patch('/tasks/:id', auth, async(req, res) => {
             res.status(500).send(e)
         }
     } else {
-        res.status(400).send("accepted keys: ['completed', 'description']")
+        res.status(400).send("accepted keys: ['completed', 'description']", "collectionName")
     }
 });
 

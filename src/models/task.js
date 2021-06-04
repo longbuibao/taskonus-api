@@ -4,7 +4,6 @@ const taskSchema = new mongoose.Schema({
     description: {
         type: String,
         require: true,
-        default: null,
         validate(val) {
             if (!val) {
                 throw new Error('Check again your input')
@@ -14,6 +13,9 @@ const taskSchema = new mongoose.Schema({
     completed: {
         type: Boolean,
         default: false
+    },
+    collectionName: {
+        type: String
     },
     owner: {
         type: mongoose.Schema.Types.ObjectId,

@@ -5,11 +5,15 @@
     "main": "index.js",
     "scripts": {
         "start": "node ./src/index.js",
-        "dev": " nodemon -r dotenv/config ./src/index.js"
+        "dev": " nodemon -r dotenv/config ./src/index.js dotenv_config_path=./test.env",
+        "test": "jest --watch --runInBand --setupFiles dotenv/config ./test.env"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/longbuibao/taskApp.git"
+    },
+    "jest": {
+        "testEnvironment": "node"
     },
     "keywords": [],
     "author": "",
@@ -31,7 +35,9 @@
         "validator": "^13.6.0"
     },
     "devDependencies": {
+        "dotenv": "^10.0.0",
+        "jest": "^27.0.1",
         "nodemon": "^2.0.7",
-        "dotenv": "^10.0.0"
+        "supertest": "^6.1.3"
     }
 }
