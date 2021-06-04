@@ -13,14 +13,14 @@ router.post('/users', async(req, res) => {
         const user = new User(req.body)
         await user.save()
 
-        // mailer({
-        //     from: process.env.NODEMAILER_USERNAME,
-        //     to: user.email,
-        //     subject: 'Your account is successfully created',
-        //     text: 'Star your plan with your new task manager application'
-        // }).catch(e => {
-        //     console.log('something wrong with mailer')
-        // })
+        mailer({
+            from: process.env.NODEMAILER_USERNAME,
+            to: user.email,
+            subject: 'Your account is successfully created',
+            text: 'Star your plan with your new task manager application'
+        }).catch(e => {
+            console.log('something wrong with mailer')
+        })
 
         const token = await user.generateAuthToken()
         res.status(201).send(token)
@@ -40,14 +40,14 @@ router.post('/users/login', async(req, res) => {
             currentdate.getHours() + ":" +
             currentdate.getMinutes()
 
-        // mailer({
-        //     from: process.env.NODEMAILER_USERNAME,
-        //     to: user.email,
-        //     subject: 'New login',
-        //     text: `Your account was login at ${datetime} using ${os.platform()}`
-        // }).catch(e => {
-        //     console.log('something wrong with mailer')
-        // })
+        mailer({
+            from: process.env.NODEMAILER_USERNAME,
+            to: user.email,
+            subject: 'New login',
+            text: `Your account was login at ${datetime} using ${os.platform()}`
+        }).catch(e => {
+            console.log('something wrong with mailer')
+        })
 
         const token = await user.generateAuthToken()
         res.status(200).send({ user, token })
@@ -108,14 +108,14 @@ router.delete('/users/me', auth, async(req, res) => {
     try {
         await req.user.remove()
 
-        // mailer({
-        //     from: process.env.NODEMAILER_USERNAME,
-        //     to: req.user.email,
-        //     subject: 'Your account is successfully deleted',
-        //     text: 'Thank you for using our application, hope you back soon!'
-        // }).catch(e => {
-        //     console.log('something wrong with mailer')
-        // })
+        mailer({
+            from: process.env.NODEMAILER_USERNAME,
+            to: req.user.email,
+            subject: 'Your account is successfully deleted',
+            text: 'Thank you for using our application, hope you back soon!'
+        }).catch(e => {
+            console.log('something wrong with mailer')
+        })
 
         res.send(`deleted user ${req.user.email}`)
 
