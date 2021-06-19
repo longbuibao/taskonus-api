@@ -35,6 +35,7 @@ router.get('/tasks/:id', auth, async(req, res) => {
 //fetch {{url}}/limit=10?skip=0  --> fetch 10 and skip 0 page
 //fetch {{url}}/sortBy=createdAt:asc (desc)
 //fetch {{url}}/tasks?collectionName
+//fetch {{url}}/tasks?boardName
 router.get('/tasks', auth, async(req, res) => {
     const match = {}
     const sort = {}
@@ -49,7 +50,9 @@ router.get('/tasks', auth, async(req, res) => {
     }
     if (req.query.collectionName) {
         match.collectionName = req.query.collectionName
-        console.log(match)
+    }
+    if (req.query.boardName) {
+        match.boardName = req.query.boardName
     }
     try {
         await req.user.populate({
