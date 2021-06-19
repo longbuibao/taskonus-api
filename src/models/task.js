@@ -17,6 +17,7 @@ const taskSchema = new mongoose.Schema({
     collectionName: {
         type: String
     },
+    boardName: String,
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         require: true,
