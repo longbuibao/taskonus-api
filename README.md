@@ -36,7 +36,7 @@ DB_USER=your-mongodb-user
 DB_PASS=your-mongodb-password
 ```
 to start development
-##### Or with this [heroku app](https://task-api-ie213-l21.herokuapp.com/) using Postman, import `task-api.postman_collection.json` collection
+##### Or with this heroku app (https://task-api-ie213-l21.herokuapp.com/) using Postman, import `task-api.postman_collection.json` collection
 
 
 
