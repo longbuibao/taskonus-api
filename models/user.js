@@ -3,7 +3,6 @@ const validator = require('validator')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Task = require('../models/task')
-const mailer = require('../utils/mailer')
 
 
 const userSchema = new mongoose.Schema({
@@ -97,11 +96,14 @@ userSchema.statics.findByCredentials = async(userObject) => {
     const { email, password } = userObject
     const user = await User.findOne({ email })
     if (!user) {
-        throw new Error('unable to login')
+        throw new Error({
+            status: 404,
+            message: 'Not found that email'
+        })
     }
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
-        throw new Error('email or password is incorrect')
+        throw new Error('Email or password is incorrect')
     }
     return user
 }
