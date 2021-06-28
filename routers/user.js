@@ -4,9 +4,15 @@ const sharp = require('sharp')
 const mailer = require('../utils/mailer')
 const os = require('os')
 const router = new express.Router()
+const path = require('path')
 
 const auth = require('../middleware/auth')
-const User = require('../models/user');
+const User = require('../models/user')
+
+router.get('/test', (req, res) => {
+    res.render('test')
+})
+
 //create a user
 router.post('/users', async(req, res) => {
     try {
@@ -22,8 +28,9 @@ router.post('/users', async(req, res) => {
             console.log('something wrong with mailer')
         })
 
-        const token = await user.generateAuthToken()
-        res.status(201).send(token)
+        res.status(201).send({
+            owner: user._id
+        });
     } catch (e) {
         res.status(400).send(e)
     }
@@ -50,9 +57,14 @@ router.post('/users/login', async(req, res) => {
         })
 
         const token = await user.generateAuthToken()
-        res.status(200).send({ user, token })
+
+        res.status(200).send({
+            token,
+            owner: user._id
+        })
+
     } catch (e) {
-        res.status(400).send(e.message)
+        res.status(400).send(e.toString())
     }
 });
 //logout user
@@ -62,7 +74,9 @@ router.post('/users/logout', auth, async(req, res) => {
             return token.token !== req.token
         })
         await req.user.save()
-        res.send(req.user)
+        res.status(200).send({
+            message: 'Đã đăng xuất'
+        })
     } catch (e) {
         res.status(500).send(e.message)
     }

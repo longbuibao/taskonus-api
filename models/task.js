@@ -15,9 +15,13 @@ const taskSchema = new mongoose.Schema({
         default: false
     },
     collectionName: {
-        type: String
+        type: String,
+        default: "Untitled"
     },
-    boardName: String,
+    boardName: {
+        type: String,
+        default: "Untitled"
+    },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         require: true,
