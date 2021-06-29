@@ -99,6 +99,7 @@ router.get('/users/me', auth, async(req, res) => {
 router.patch('/users/me', auth, async(req, res) => {
     const newValue = req.body
     const keys = Object.keys(newValue)
+    console.log(req)
     const check = keys.every((key) => {
         return ["name", "email", "password"].includes(key)
     })
@@ -152,21 +153,11 @@ const upload = multer({
     }
 });
 //upload user's avatar
-router.post('/users/me/avatar', auth, upload.single('avatar'), async(req, res) => {
-
-    try {
-        const buffer = await sharp(req.file.buffer)
-            .resize({ width: 250 })
-            .toBuffer()
-        req.file.buffer = buffer
-    } catch (e) {
-        return res.status(400).send({ error: e.message, hint: 'Select a file!' })
-    }
-
+router.post('/users/me/avatar', auth, async(req, res) => {
     try {
         req.user.avatarObj = {
-            data: req.file.buffer,
-            contentType: 'image/' + req.file.originalname.match(/\.(jpg|jpeg|png|gif)$/)[1]
+            data: req.body.file.buffer,
+            contentType: 'image/' + req.body.originalname.match(/\.(jpg|jpeg|png|gif)$/)[1]
         };
         await req.user.save();
         res.send({ message: "User avatar uploaded" });
@@ -195,14 +186,35 @@ router.get('/users/:id/avatar', async(req, res) => {
 
         if (user && !user.avatarObj.$isEmpty()) {
             res.set('Content-Type', user.avatarObj.contentType)
-            res.send(user.avatarObj.data)
+            res.send(user.avatarObj)
         } else {
-            throw new Error('Not found user or image')
+            res.send({ message: 'no avatar' })
         }
 
     } catch (err) {
-        res.status(404).send({ error: err.message })
+        res.send({ message: err.message })
     }
 });
+
+router.post('/check-old-password', auth, async(req, res) => {
+    const userObject = {
+        email: req.user.email,
+        password: req.body.currentPwd
+    }
+    try {
+        const user = await User.findByCredentials(userObject)
+        if (user) {
+            res.status(200).send({
+                isMatch: true,
+                user
+            })
+        }
+    } catch (error) {
+        res.status(400).send({
+            message: error.message
+        })
+    }
+
+})
 
 module.exports = router
