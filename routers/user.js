@@ -99,7 +99,6 @@ router.get('/users/me', auth, async(req, res) => {
 router.patch('/users/me', auth, async(req, res) => {
     const newValue = req.body
     const keys = Object.keys(newValue)
-    console.log(req)
     const check = keys.every((key) => {
         return ["name", "email", "password"].includes(key)
     })
