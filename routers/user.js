@@ -22,8 +22,8 @@ router.post('/users', async(req, res) => {
         mailer({
             from: process.env.NODEMAILER_USERNAME,
             to: user.email,
-            subject: 'Your account is successfully created',
-            text: 'Star your plan with your new task manager application'
+            subject: 'Your account was successfully created',
+            text: 'Start your plan with your new task manager application'
         }).catch(e => {
             console.log('something wrong with mailer')
         })
@@ -51,7 +51,7 @@ router.post('/users/login', async(req, res) => {
             from: process.env.NODEMAILER_USERNAME,
             to: user.email,
             subject: 'New login',
-            text: `Your account was login at ${datetime} using ${os.platform()}`
+            text: `Your account was logged in at ${datetime} using ${os.platform()}`
         }).catch(e => {
             console.log('something wrong with mailer')
         })
@@ -126,7 +126,7 @@ router.delete('/users/me', auth, async(req, res) => {
         mailer({
             from: process.env.NODEMAILER_USERNAME,
             to: req.user.email,
-            subject: 'Your account is successfully deleted',
+            subject: 'Your account was successfully deleted',
             text: 'Thank you for using our application, hope you back soon!'
         }).catch(e => {
             console.log('something wrong with mailer')
