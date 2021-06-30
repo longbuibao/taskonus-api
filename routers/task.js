@@ -119,4 +119,14 @@ router.delete('/tasks/:id', auth, async(req, res) => {
     }
 });
 
+router.patch('/edit/boardName', auth, async(req, res) => {
+    const { newBoardName, oldBoardName } = req.body
+    const tasks = await Task.find({ owner: req.user._id, boardName: oldBoardName })
+    tasks.forEach(async(task) => {
+        task.boardName = newBoardName
+        await task.save()
+    })
+    res.status(200).send()
+})
+
 module.exports = router
