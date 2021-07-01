@@ -1,4 +1,5 @@
-const express = require('express')
+const express = require('express');
+const { ReplSet } = require('mongodb');
 const router = new express.Router()
 const auth = require('../middleware/auth')
 const Task = require('../models/task');
@@ -127,6 +128,19 @@ router.patch('/edit/boardName', auth, async(req, res) => {
         await task.save()
     })
     res.status(200).send()
+})
+
+router.delete('/edit/tasks/boardName', auth, async(req, res) => {
+    const { boardName } = req.query
+    const tasks = await Task.find({ owner: req.user._id, boardName })
+    if (tasks.length !== 0) {
+        tasks.forEach(async(task) => {
+            await task.remove()
+        })
+        res.status(200).send()
+    } else {
+        res.status(400).send()
+    }
 })
 
 module.exports = router
