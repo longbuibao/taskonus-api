@@ -148,8 +148,12 @@ router.delete('/edit/tasks/boardName', auth, async(req, res) => {
 })
 
 router.patch('/edit/tasks/collectionName', auth, async(req, res) => {
-    const { oldCollectionName, newCollectionName } = req.body
-    const tasks = await Task.find({ owner: req.user._id, collectionName: oldCollectionName })
+    const { oldCollectionName, newCollectionName, newBoardName } = req.body
+    const tasks = await Task.find({
+        owner: req.user._id,
+        collectionName: oldCollectionName,
+        boardName: newBoardName
+    })
     if (tasks.length !== 0) {
         tasks.forEach(async(task) => {
             task.collectionName = newCollectionName
@@ -162,8 +166,14 @@ router.patch('/edit/tasks/collectionName', auth, async(req, res) => {
 })
 
 router.delete('/edit/tasks/collectionName', auth, async(req, res) => {
-    const { collectionName } = req.query
-    const tasks = await Task.find({ owner: req.user._id, collectionName })
+    const { collectionName, boardName } = req.query
+
+    const tasks = await Task.find({
+        boardName: boardName,
+        owner: req.user._id,
+        collectionName
+    })
+
     if (tasks.length !== 0) {
         tasks.forEach(async(task) => {
             await task.remove()
@@ -173,4 +183,27 @@ router.delete('/edit/tasks/collectionName', auth, async(req, res) => {
         res.status(400).send()
     }
 })
+
+router.patch('/edit/tasks/description', auth, async(req, res) => {
+    const { oldData, newData, whereTo } = req.body
+    const { boardName, collectionName } = whereTo
+
+    const task = await Task.findOne({
+        owner: req.user._id,
+        boardName,
+        collectionName,
+        description: oldData.oldDescription
+    })
+
+    if (task) {
+        task.description = newData.newDescription
+        task.completed = newData.newCompleted
+        await task.save()
+        res.status(200).send()
+    } else {
+        res.status(400).send()
+    }
+
+})
+
 module.exports = router
