@@ -160,4 +160,17 @@ router.patch('/edit/tasks/collectionName', auth, async(req, res) => {
         res.status(400).send()
     }
 })
+
+router.delete('/edit/tasks/collectionName', auth, async(req, res) => {
+    const { collectionName } = req.query
+    const tasks = await Task.find({ owner: req.user._id, collectionName })
+    if (tasks.length !== 0) {
+        tasks.forEach(async(task) => {
+            await task.remove()
+        })
+        res.status(200).send()
+    } else {
+        res.status(400).send()
+    }
+})
 module.exports = router
