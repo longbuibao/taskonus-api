@@ -1,4 +1,5 @@
-const express = require('express')
+const express = require('express');
+const { ReplSet } = require('mongodb');
 const router = new express.Router()
 const auth = require('../middleware/auth')
 const Task = require('../models/task');
@@ -122,11 +123,54 @@ router.delete('/tasks/:id', auth, async(req, res) => {
 router.patch('/edit/boardName', auth, async(req, res) => {
     const { newBoardName, oldBoardName } = req.body
     const tasks = await Task.find({ owner: req.user._id, boardName: oldBoardName })
-    tasks.forEach(async(task) => {
-        task.boardName = newBoardName
-        await task.save()
-    })
-    res.status(200).send()
+    if (tasks.length !== 0) {
+        tasks.forEach(async(task) => {
+            task.boardName = newBoardName
+            await task.save()
+        })
+        res.status(200).send()
+    } else {
+        res.status(400).send()
+    }
 })
 
+router.delete('/edit/tasks/boardName', auth, async(req, res) => {
+    const { boardName } = req.query
+    const tasks = await Task.find({ owner: req.user._id, boardName })
+    if (tasks.length !== 0) {
+        tasks.forEach(async(task) => {
+            await task.remove()
+        })
+        res.status(200).send()
+    } else {
+        res.status(400).send()
+    }
+})
+
+router.patch('/edit/tasks/collectionName', auth, async(req, res) => {
+    const { oldCollectionName, newCollectionName } = req.body
+    const tasks = await Task.find({ owner: req.user._id, collectionName: oldCollectionName })
+    if (tasks.length !== 0) {
+        tasks.forEach(async(task) => {
+            task.collectionName = newCollectionName
+            await task.save()
+        })
+        res.status(200).send()
+    } else {
+        res.status(400).send()
+    }
+})
+
+router.delete('/edit/tasks/collectionName', auth, async(req, res) => {
+    const { collectionName } = req.query
+    const tasks = await Task.find({ owner: req.user._id, collectionName })
+    if (tasks.length !== 0) {
+        tasks.forEach(async(task) => {
+            await task.remove()
+        })
+        res.status(200).send()
+    } else {
+        res.status(400).send()
+    }
+})
 module.exports = router
