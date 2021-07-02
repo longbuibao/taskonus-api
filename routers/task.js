@@ -1,9 +1,9 @@
 const express = require('express');
-const { ReplSet } = require('mongodb');
 const router = new express.Router()
 const auth = require('../middleware/auth')
 const Task = require('../models/task');
-
+const Fuse = require('fuse.js');
+const { ReplSet } = require('mongodb');
 //create a task
 router.post('/tasks', auth, async(req, res) => {
     const task = new Task({
@@ -205,5 +205,26 @@ router.patch('/edit/tasks/description', auth, async(req, res) => {
     }
 
 })
+
+router.get('/search/tasks', auth, async(req, res) => {
+    const { boardName } = req.query
+    const boardNames = await Task.find({ owner: req.user._id }).distinct('boardName')
+    const options = {
+        includeScore: true
+    }
+
+    const fuse = new Fuse(boardNames, options)
+
+    const result = fuse.search(boardName)
+
+    console.log(result)
+
+    if (result.length !== 0) {
+        res.status(200).send(result)
+    } else {
+        res.status(404).send()
+    }
+})
+
 
 module.exports = router
