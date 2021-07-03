@@ -38,8 +38,11 @@ router.get('/tasks/:id', auth, async(req, res) => {
 //fetch {{url}}/tasks?collectionName
 //fetch {{url}}/tasks?boardName
 router.get('/tasks', auth, async(req, res) => {
+
     const match = {}
     const sort = {}
+
+    console.log(req.query)
 
     if (req.query.completed) {
         match.completed = req.query.completed === 'true'
@@ -55,6 +58,7 @@ router.get('/tasks', auth, async(req, res) => {
     if (req.query.boardName) {
         match.boardName = req.query.boardName
     }
+    console.log(match, sort)
     try {
         await req.user.populate({
             path: 'tasks',
