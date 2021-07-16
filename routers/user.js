@@ -25,12 +25,16 @@ router.post('/users', async(req, res) => {
             subject: 'Your account was successfully created',
             text: 'Start your plan with your new task manager application'
         }).catch(e => {
-            console.log('something wrong with mailer')
+            console.log(e.response)
         })
 
+        const token = await user.generateAuthToken()
+
         res.status(201).send({
+            token,
             owner: user._id
-        });
+        })
+
     } catch (e) {
         res.status(400).send(e)
     }
