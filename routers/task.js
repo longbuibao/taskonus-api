@@ -19,25 +19,46 @@ router.post('/tasks', auth, async(req, res) => {
 });
 
 //get task by id
-router.get('/tasks/:id', auth, async(req, res) => {
-    const id = req.params.id
-    try {
-        const task = await Task.findOne({ _id: id, owner: req.user._id })
-        if (!task) {
-            return res.status(404).send('not found task')
-        }
-        res.send(task)
-    } catch (error) {
-        res.status(500).send('something wrong')
-    }
-});
+// router.get('/tasks/:id', auth, async(req, res) => {
+//     const id = req.params.id
+//     try {
+//         const task = await Task.findOne({ _id: id, owner: req.user._id })
+//         if (!task) {
+//             return res.status(404).send('not found task')
+//         }
+//         res.send(task)
+//     } catch (error) {
+//         res.status(500).send('something wrong')
+//     }
+// });
 
 //fetch {{url}}/tasks?completed=true
 //fetch {{url}}/limit=10?skip=0  --> fetch 10 and skip 0 page
 //fetch {{url}}/sortBy=createdAt:asc (desc)
 //fetch {{url}}/tasks?collectionName
 //fetch {{url}}/tasks?boardName
+router.get('/count-tasks', auth, async(req, res) => {
+    if (req.query.deadlineFrom) {
+        const { deadlineFrom, deadlineTo } = req.query
+        const { _id } = req.user
+        const numberOfCompleted = await Task.countDocuments({ owner: _id, completed: true, createdAt: { $lte: new Date(deadlineTo), $gt: new Date(deadlineFrom) } })
+        const numberOfNotCompleted = await Task.countDocuments({ owner: _id, completed: false, createdAt: { $lte: new Date(deadlineTo), $gt: new Date(deadlineFrom) } })
+
+        const fromMonth = new Date(deadlineFrom) + 1
+        const toMonth = new Date(deadlineTo).getMonth() + 1
+
+
+
+        console.log(numberOfCompleted, numberOfNotCompleted)
+        res.send({
+            numberOfCompleted,
+            numberOfNotCompleted
+        })
+    }
+})
 router.get('/tasks', auth, async(req, res) => {
+
+    console.log(req.query)
 
     const match = {}
     const sort = {}
@@ -56,6 +77,7 @@ router.get('/tasks', auth, async(req, res) => {
     if (req.query.boardName) {
         match.boardName = req.query.boardName
     }
+
     try {
         await req.user.populate({
             path: 'tasks',
