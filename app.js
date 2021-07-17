@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: false }))
 app.set('view engine', 'ejs')
 app.set('views', `${__dirname}/public/views`)
 
-// setInterval(notification, 10000)
+setInterval(notification, 3600 * 1000 * 24) // moi ngay tao 1 notification
 
 app.use(userRoute)
 app.use(taskRoute)
