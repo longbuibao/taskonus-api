@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: false }))
 app.set('view engine', 'ejs')
 app.set('views', `${__dirname}/public/views`)
 
-notification()
+setInterval(notification, 10000)
 
 app.use(userRoute)
 app.use(taskRoute)
