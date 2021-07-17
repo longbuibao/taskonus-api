@@ -1,11 +1,11 @@
 const express = require('express')
-const path = require('path')
 require('./db/mongoose')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
 
 const userRoute = require('./routers/user')
 const taskRoute = require('./routers/task')
+const { notification } = require('./utils/notification')
 
 const app = express()
 
@@ -33,6 +33,8 @@ app.use(express.urlencoded({ extended: false }))
 
 app.set('view engine', 'ejs')
 app.set('views', `${__dirname}/public/views`)
+
+notification()
 
 app.use(userRoute)
 app.use(taskRoute)
